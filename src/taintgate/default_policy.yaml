@@ -1,0 +1,21 @@
+# First matching rule wins. Unmatched tools are treated as neutral.
+rules:
+  # Sources: results from these tools are untrusted and taint the session.
+  - {match: WebFetch, role: source, trust: untrusted}
+  - {match: WebSearch, role: source, trust: untrusted}
+  - {match: "mcp__*read*", role: source, trust: untrusted}
+  - {match: "mcp__*fetch*", role: source, trust: untrusted}
+  - {match: "mcp__*get*", role: source, trust: untrusted}
+  - {match: "mcp__*search*", role: source, trust: untrusted}
+  - {match: "mcp__*list*", role: source, trust: untrusted}
+  # Sinks: gated when untrusted data may have influenced the call.
+  - {match: Bash, role: sink, mode: strict, action: ask}
+  - {match: Write, role: sink, mode: flow, action: ask}
+  - {match: Edit, role: sink, mode: flow, action: ask}
+  - {match: "mcp__*send*", role: sink, mode: strict, action: deny}
+  - {match: "mcp__*post*", role: sink, mode: strict, action: deny}
+  - {match: "mcp__*email*", role: sink, mode: strict, action: deny}
+  # Local read-only tools.
+  - {match: Read, role: neutral}
+  - {match: Glob, role: neutral}
+  - {match: Grep, role: neutral}

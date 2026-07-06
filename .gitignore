@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+.superpowers/
+*.egg-info/
+results.json
