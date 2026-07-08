@@ -76,12 +76,26 @@ def cmd_install(name: str, write: str | None) -> int:
     return 0
 
 
+def cmd_proxy(name: str, session: str, cmd: list[str]) -> int:
+    from .proxy import McpProxy
+    if cmd and cmd[0] == "--":
+        cmd = cmd[1:]
+    if not cmd:
+        print("usage: taintgate proxy [--name N] -- <server command...>", file=sys.stderr)
+        return 2
+    return McpProxy(build_engine(), cmd, session, name=name).run(sys.stdin, sys.stdout)
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="taintgate")
     sub = ap.add_subparsers(dest="cmd", required=True)
     h = sub.add_parser("hook"); h.add_argument("agent", choices=["claude", "codex"])
     i = sub.add_parser("install"); i.add_argument("agent", choices=["claude", "codex"]); i.add_argument("--write")
+    px = sub.add_parser("proxy"); px.add_argument("--name", default="proxied")
+    px.add_argument("--session", default="mcp-proxy"); px.add_argument("server_cmd", nargs=argparse.REMAINDER)
     args = ap.parse_args(argv)
+    if args.cmd == "proxy":
+        return cmd_proxy(args.name, args.session, args.server_cmd)
     if args.cmd == "hook":
         return cmd_hook(args.agent)
     return cmd_install(args.agent, args.write)
