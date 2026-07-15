@@ -8,6 +8,9 @@ from .policy import Policy
 from .state import StateStore
 
 
+MAX_ENTITIES = 2000
+
+
 class Engine:
     def __init__(self, policy: Policy, store: StateStore, audit_path: Path | None = None):
         self.policy = policy
@@ -36,6 +39,8 @@ class Engine:
         st.tainted = True
         st.taint_sources.append(tool)
         st.untrusted_entities |= extract_entities(json.dumps(result, default=str))
+        if len(st.untrusted_entities) > MAX_ENTITIES:  # bound state size; oldest-agnostic trim
+            st.untrusted_entities = set(sorted(st.untrusted_entities)[:MAX_ENTITIES])
         self.store.save(st)
         self._audit(session_id, tool, "taint", "untrusted source result recorded", rule.match)
 

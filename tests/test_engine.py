@@ -65,3 +65,10 @@ def test_audit_log_lines_are_valid_json(eng, tmp_path):
     eng.check_call("s", "Bash", {})
     lines = (tmp_path / "audit.jsonl").read_text().splitlines()
     assert lines and all({"ts", "session", "tool", "decision"} <= json.loads(l).keys() for l in lines)
+
+
+def test_state_entities_stay_bounded_across_many_results(eng):
+    for i in range(20):
+        eng.record_result("s", "WebFetch", " ".join(f"u{i}_{j}@x.com" for j in range(500)))
+    st = eng.store.load("s")
+    assert len(st.untrusted_entities) <= 2000

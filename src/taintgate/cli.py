@@ -86,6 +86,27 @@ def cmd_proxy(name: str, session: str, cmd: list[str]) -> int:
     return McpProxy(build_engine(), cmd, session, name=name).run(sys.stdin, sys.stdout)
 
 
+def cmd_eval(a) -> int:
+    from .evalkit import report
+    from .evalkit.agents import openrouter_llm, scripted_llm
+    from .evalkit.attacker import text_llm
+    from .evalkit.defenses import DEFENSES
+    from .evalkit.run import run_matrix
+    from .evalkit.scenarios import GOALS, TASKS
+
+    llm_agent = a.agent == "llm"
+    factory = (lambda: openrouter_llm(a.model)) if llm_agent else scripted_llm
+    judge = text_llm(a.model) if llm_agent else None
+    attacker = text_llm(a.attacker_model or a.model) if llm_agent and a.attacker == "adaptive" else None
+    tasks, goals = (TASKS[: a.limit_tasks], GOALS[: a.limit_goals]) if a.limit_tasks else (TASKS, GOALS)
+    recs = run_matrix(tasks, goals, a.defenses or DEFENSES, factory, a.attacker, a.rounds,
+                      judge_llm=judge, attacker_llm=attacker)
+    if a.out:
+        Path(a.out).write_text(json.dumps(recs, indent=1), encoding="utf-8")
+    print(report.to_markdown(report.summarize(recs)))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="taintgate")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -93,7 +114,15 @@ def main(argv: list[str] | None = None) -> int:
     i = sub.add_parser("install"); i.add_argument("agent", choices=["claude", "codex"]); i.add_argument("--write")
     px = sub.add_parser("proxy"); px.add_argument("--name", default="proxied")
     px.add_argument("--session", default="mcp-proxy"); px.add_argument("server_cmd", nargs=argparse.REMAINDER)
+    ev = sub.add_parser("eval"); ev.add_argument("--agent", choices=["scripted", "llm"], default="scripted")
+    ev.add_argument("--model", default="anthropic/claude-haiku-4.5"); ev.add_argument("--attacker-model")
+    ev.add_argument("--attacker", choices=["static", "adaptive"], default="static")
+    ev.add_argument("--rounds", type=int, default=5); ev.add_argument("--out")
+    ev.add_argument("--defenses", nargs="*"); ev.add_argument("--limit-tasks", type=int, default=0)
+    ev.add_argument("--limit-goals", type=int, default=5)
     args = ap.parse_args(argv)
+    if args.cmd == "eval":
+        return cmd_eval(args)
     if args.cmd == "proxy":
         return cmd_proxy(args.name, args.session, args.server_cmd)
     if args.cmd == "hook":
