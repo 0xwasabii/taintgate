@@ -100,7 +100,7 @@ def cmd_eval(a) -> int:
     attacker = text_llm(a.attacker_model or a.model) if llm_agent and a.attacker == "adaptive" else None
     tasks, goals = (TASKS[: a.limit_tasks], GOALS[: a.limit_goals]) if a.limit_tasks else (TASKS, GOALS)
     recs = run_matrix(tasks, goals, a.defenses or DEFENSES, factory, a.attacker, a.rounds,
-                      judge_llm=judge, attacker_llm=attacker)
+                      judge_llm=judge, attacker_llm=attacker, workers=a.workers if llm_agent else 1)
     if a.out:
         Path(a.out).write_text(json.dumps(recs, indent=1), encoding="utf-8")
     print(report.to_markdown(report.summarize(recs)))
@@ -119,7 +119,7 @@ def main(argv: list[str] | None = None) -> int:
     ev.add_argument("--attacker", choices=["static", "adaptive"], default="static")
     ev.add_argument("--rounds", type=int, default=5); ev.add_argument("--out")
     ev.add_argument("--defenses", nargs="*"); ev.add_argument("--limit-tasks", type=int, default=0)
-    ev.add_argument("--limit-goals", type=int, default=5)
+    ev.add_argument("--limit-goals", type=int, default=5); ev.add_argument("--workers", type=int, default=8)
     args = ap.parse_args(argv)
     if args.cmd == "eval":
         return cmd_eval(args)

@@ -39,10 +39,12 @@ Sessions are separate: taint in one session never gates another.
 
 ```bash
 taintgate eval --agent scripted --attacker adaptive --rounds 4        # offline, free
-taintgate eval --agent llm --model <openrouter-model> --attacker adaptive --rounds 5   # needs OPENROUTER_API_KEY
+taintgate eval --agent llm --model openai/gpt-4o-mini --attacker adaptive --rounds 8   # needs OPENROUTER_API_KEY
 ```
 
-Mock inbox/web/email/shell tools, 12 tasks, 5 attack goals. Defenses compared: `none`, `allowlist` (per-task tools and recipients, an oracle-ish baseline), `judge` (injection detector), `taintgate`, `taintgate-flow`. Results and caveats: [docs/results.md](docs/results.md).
+Mock inbox/web/email/shell tools, 12 tasks, 5 attack goals. Defenses compared: `none`, `allowlist` (per-task tools and recipients, an oracle-ish baseline), `judge` (injection detector), `taintgate`, `taintgate-flow`. 
+
+Headline (gpt-4o-mini, static attacker, 50 attack trials per defense): undefended 62% attack success; allowlist 4%; LLM judge 0%; taintgate strict 0% but only 58% of clean tasks complete; taintgate-flow 8% with 92% completion. My cheap adaptive attacker did not beat any defense, so this does **not** reproduce the "adaptive attacks break defenses" result. Details and caveats: [docs/results.md](docs/results.md).
 
 ## Limits
 
