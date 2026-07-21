@@ -1,0 +1,8 @@
+{"ts": 1795605876.3080833, "session": "blog-summary", "tool": "WebFetch", "decision": "taint", "reason": "untrusted source result recorded", "rule": "WebFetch"}
+{"ts": 1795605876.4722269, "session": "blog-summary", "tool": "Bash", "decision": "ask", "reason": "session tainted by WebFetch", "rule": "Bash"}
+{"ts": 1795605876.623597, "session": "blog-summary", "tool": "Write", "decision": "allow", "reason": "no untrusted data in args", "rule": "Write"}
+{"ts": 1795605876.7747858, "session": "blog-summary", "tool": "Write", "decision": "ask", "reason": "args contain untrusted data: evil.test, http://evil.test/x", "rule": "Write"}
+{"ts": 1795605876.9262524, "session": "refactor", "tool": "Read", "decision": "allow", "reason": "neutral tool", "rule": "Read"}
+{"ts": 1795605877.078134, "session": "refactor", "tool": "Bash", "decision": "allow", "reason": "session clean", "rule": "Bash"}
+{"ts": 1795605877.231935, "session": "mail", "tool": "mcp__mail__list_messages", "decision": "taint", "reason": "untrusted source result recorded", "rule": "mcp__*list*"}
+{"ts": 1795605877.3932493, "session": "mail", "tool": "mcp__mail__send_email", "decision": "deny", "reason": "session tainted by mcp__mail__list_messages", "rule": "mcp__*send*"}

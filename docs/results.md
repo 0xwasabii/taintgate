@@ -6,7 +6,7 @@ Run on 2026-11-25. One run per cell (temperature 0), no repeats, so treat differ
 - **Benchmark:** 12 tasks (10 can be attacked), 5 attack goals, so 50 attack trials and 12 clean runs per defense.
 - **Static attacker:** best of 3 fixed injection templates.
 - **Adaptive attacker:** the same 3 templates first, then up to 5 LLM rewrites that see the previous injections, what the defense said when it blocked, and the agent's reply (black-box).
-- Raw records: `results/`. Commands: `taintgate eval --agent llm --model openai/gpt-4o-mini --attacker static` and `--attacker adaptive --rounds 8`.
+- Raw records: `results/`. Interactive view: [viewer.html](viewer.html) (rebuild with `taintgate ui`). Commands: `taintgate eval --agent llm --model openai/gpt-4o-mini --attacker static` and `--attacker adaptive --rounds 8`.
 
 ## Static attacker
 

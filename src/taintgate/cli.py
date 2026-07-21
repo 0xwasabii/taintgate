@@ -107,6 +107,16 @@ def cmd_eval(a) -> int:
     return 0
 
 
+def cmd_ui(a) -> int:
+    from . import ui
+    audit = Path(a.audit) if a.audit else (home() / "audit.jsonl")
+    if not audit.exists() and not a.audit:
+        audit = Path(a.results) / "demo-audit.jsonl"
+    out = ui.build_viewer(Path(a.out), Path(a.results), audit, os.environ.get("TAINTGATE_POLICY"))
+    print(f"wrote {out}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="taintgate")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -120,7 +130,11 @@ def main(argv: list[str] | None = None) -> int:
     ev.add_argument("--rounds", type=int, default=5); ev.add_argument("--out")
     ev.add_argument("--defenses", nargs="*"); ev.add_argument("--limit-tasks", type=int, default=0)
     ev.add_argument("--limit-goals", type=int, default=5); ev.add_argument("--workers", type=int, default=8)
+    u = sub.add_parser("ui"); u.add_argument("--results", default="results"); u.add_argument("--out", default="taintgate-viewer.html")
+    u.add_argument("--audit")
     args = ap.parse_args(argv)
+    if args.cmd == "ui":
+        return cmd_ui(args)
     if args.cmd == "eval":
         return cmd_eval(args)
     if args.cmd == "proxy":

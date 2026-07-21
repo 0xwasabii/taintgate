@@ -46,6 +46,14 @@ Mock inbox/web/email/shell tools, 12 tasks, 5 attack goals. Defenses compared: `
 
 Headline (gpt-4o-mini, static attacker, 50 attack trials per defense): undefended 62% attack success; allowlist 4%; LLM judge 0%; taintgate strict 0% but only 58% of clean tasks complete; taintgate-flow 8% with 92% completion. My cheap adaptive attacker did not beat any defense, so this does **not** reproduce the "adaptive attacks break defenses" result. Details and caveats: [docs/results.md](docs/results.md).
 
+## Viewer
+
+```bash
+taintgate ui --out docs/viewer.html     # one self-contained HTML file, open it in a browser
+```
+
+Four tabs: results (trade-off chart, numbers, per-attack heatmap, static/adaptive toggle), every trial with filters, the decision log from `~/.taintgate/audit.jsonl` (falls back to `results/demo-audit.jsonl`), and the active policy. The built copy is [docs/viewer.html](docs/viewer.html).
+
 ## Limits
 
 - No taint through shell pipelines, or through files written and re-read later.
