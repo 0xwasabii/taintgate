@@ -132,7 +132,11 @@ def main(argv: list[str] | None = None) -> int:
     ev.add_argument("--limit-goals", type=int, default=5); ev.add_argument("--workers", type=int, default=8)
     u = sub.add_parser("ui"); u.add_argument("--results", default="results"); u.add_argument("--out", default="taintgate-viewer.html")
     u.add_argument("--audit")
-    args = ap.parse_args(argv)
+    sub.add_parser("agentdojo", add_help=False)
+    args, rest = ap.parse_known_args(argv)
+    if args.cmd == "agentdojo":
+        from .agentdojo_defense import main as ad_main
+        return ad_main(rest)
     if args.cmd == "ui":
         return cmd_ui(args)
     if args.cmd == "eval":

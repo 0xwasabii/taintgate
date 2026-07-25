@@ -4,3 +4,9 @@ __pycache__/
 .superpowers/
 *.egg-info/
 results.json
+
+results/agentdojo*/traces/
+results/agentdojo*/logs/
+results/agentdojo-smoke/
+smoke*.log
+dry.*
