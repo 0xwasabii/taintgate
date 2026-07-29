@@ -10,3 +10,5 @@ results/agentdojo*/logs/
 results/agentdojo-smoke/
 smoke*.log
 dry.*
+.pytest_cache/
+.env
